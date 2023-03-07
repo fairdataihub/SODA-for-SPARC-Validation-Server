@@ -90,6 +90,8 @@ def val_dataset_local_pipeline(ds_path):
     # peel out the status object 
     status = blob.get('status')
 
+    print(status)
+
     # peel out the path_error_report object
     path_error_report = status.get('path_error_report')
 

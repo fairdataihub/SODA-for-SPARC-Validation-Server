@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from minimumApiVersion import get_api_version
+from apiVersion import get_api_version
 
 api = Namespace('api_version', description='Version of the API')
 
