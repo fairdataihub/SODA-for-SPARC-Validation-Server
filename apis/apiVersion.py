@@ -8,7 +8,7 @@ version = api.model('ApiVersion', {
 })
 
 
-@api.route('')
+@api.route('/')
 class ApiVersion(Resource):
     @api.marshal_with(version, False, 200,)
     @api.doc(responses={500: 'There was an internal server error'})
