@@ -25,7 +25,7 @@ class ValidateDatasetLocal(Resource):
         clientUUID = data["clientUUID"]
 
         # 400 of missing one of the arguments
-        if not dataset_structure or not manifests or not metadata_files or not clientUUID:
+        if not dataset_structure  or not metadata_files or not clientUUID:
             api.abort(400, "Missing required arguments")
 
 
