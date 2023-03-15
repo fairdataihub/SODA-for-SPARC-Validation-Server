@@ -41,7 +41,9 @@ def has_required_metadata_files(metadata_files_json):
         "subjects": False
     }
 
-    for file_name, _ in metadata_files_json:
+    for file_name, _ in metadata_files_json.items():
+        # strip extension from file_name 
+        file_name = file_name.split(".")[0]
         if file_name in REQUIRED_METADATA_FILES:
             REQUIRED_METADATA_FILES[file_name] = True
             
