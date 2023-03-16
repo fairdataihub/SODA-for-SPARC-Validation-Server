@@ -18,6 +18,8 @@ from sparcur.paths import Path as SparCurPath
 from sparcur.simple.validate import main as validate
 import pandas as pd 
 import json 
+from namespaces import NamespaceEnum, get_namespace_logger
+
 
 
 app = Flask(__name__)
@@ -26,6 +28,8 @@ app = Flask(__name__)
 
 path = os.path.join(expanduser("~"), "SODA", "skeleton")
 completed_jobs_dir = os.path.join(expanduser("~"), "SODA", "completed_jobs")
+
+namespace_logger = get_namespace_logger(NamespaceEnum.VALIDATE_DATASET)
 
 
 
@@ -155,9 +159,14 @@ def create_metadata_files(metadata_struct, path):
    for metadata_file_name in metadata_struct:
       metadata_obj = metadata_struct[metadata_file_name]
 
-      metadata_df = pd.DataFrame(metadata_obj)
+      if metadata_file_name in ["README.txt", "CHANGES.txt"]:
+         # write the data to a txt file 
+         with open(f"{path}/{metadata_file_name}.txt", "x") as metadata_file:
+            metadata_file.write(metadata_obj)
+      else:
+        metadata_df = pd.DataFrame(json.loads(metadata_obj))
 
-      metadata_df.to_excel(f"{path}/{metadata_file_name}.xlsx", index=False, engine="openpyxl")
+        metadata_df.to_excel(f"{path}/{metadata_file_name}.xlsx", index=False, engine="openpyxl")
 
 def create(dataset_structure, manifests_struct, metadata_files, clientUUID):
     """
@@ -183,8 +192,6 @@ def create(dataset_structure, manifests_struct, metadata_files, clientUUID):
     
     # create the directory for the client
     os.mkdir(path)
-
-    print(dataset_structure)
 
     create_skeleton(dataset_structure, path)
 
