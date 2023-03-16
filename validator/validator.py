@@ -68,13 +68,14 @@ def create_skeleton(dataset_structure, path):
             os.mkdir(dp)
 
         create_skeleton(dataset_structure["folders"][folder], os.path.join(path, folder))
-    for file_key in dataset_structure["files"]:
-        # TODO: If the type is bf then create a generic file with the name of the file key ( and write information to it )
-        # if dataset_structure["files"][file_key]["type"] in ["bf"]:
-        #     continue
-            
-        with open(os.path.join(path, file_key), "w") as f:
-            f.write("SODA")
+    if "files" in dataset_structure:
+        for file_key in dataset_structure["files"]:
+            # TODO: If the type is bf then create a generic file with the name of the file key ( and write information to it )
+            # if dataset_structure["files"][file_key]["type"] in ["bf"]:
+            #     continue
+                
+            with open(os.path.join(path, file_key), "w") as f:
+                f.write("SODA")
 
 def validate_validation_result(export):
     """
@@ -182,6 +183,8 @@ def create(dataset_structure, manifests_struct, metadata_files, clientUUID):
     
     # create the directory for the client
     os.mkdir(path)
+
+    print(dataset_structure)
 
     create_skeleton(dataset_structure, path)
 
