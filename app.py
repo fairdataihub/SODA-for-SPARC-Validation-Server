@@ -22,5 +22,5 @@ api.init_app(app)
 
 
 if __name__ == '__main__':
-    api.logger.info(f"Starting server on port {9009}")
-    app.run(host="127.0.0.1", port=9009)
+    api.logger.info(f"Starting server on port {9000}")
+    app.run(host="127.0.0.1", port=9000)
