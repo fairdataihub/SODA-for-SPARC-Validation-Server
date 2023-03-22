@@ -37,8 +37,8 @@ class ValidateDatasetLocal(Resource):
         except Exception as e:
             raise e
         
-
-        val_dataset_local_pipeline(generation_location)
+        with multiprocessing.Pool() as pool:
+            pool.map(val_dataset_local_pipeline, [generation_location])
 
         print("Finished a validation")
 
