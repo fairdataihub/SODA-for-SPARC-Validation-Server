@@ -18,9 +18,14 @@ api = configureAPI()
 
 configureRouteHandlers(api)
 
+@api.route("/hi")
+class Shutdown(Resource):
+    def get(self):
+        return "Hello"
+
 api.init_app(app)
 
 
 if __name__ == '__main__':
-    api.logger.info(f"Starting server on port {9009}")
-    app.run(host="127.0.0.1", port=9009)
+    api.logger.info(f"Starting server on port {4000}")
+    app.run(host="0.0.0.0", port=4000)
