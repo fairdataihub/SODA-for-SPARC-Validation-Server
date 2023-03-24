@@ -38,14 +38,10 @@ class ValidateDatasetLocal(Resource):
             raise e
         
 
-        val_dataset_local_pipeline(generation_location)
-
-        print("Finished a validation")
-
-        # try:
-        #     return val_dataset_local_pipeline(generation_location)
-        # except Exception as e:
-        #     raise e
+        try:
+            return val_dataset_local_pipeline(generation_location)
+        except Exception as e:
+            raise e
         
 
 @api.route('/validate/result/<string:clientUUID>')
