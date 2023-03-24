@@ -4,6 +4,7 @@ from namespaces import configure_namespaces
 from flask_restx import Resource
 import sys
 from werkzeug.middleware.proxy_fix import ProxyFix
+from waitress import serve
 
 configure_namespaces()
 
@@ -31,4 +32,4 @@ api.init_app(app)
 
 if __name__ == '__main__':
     api.logger.info(f"Starting server on port {4000}")
-    app.run(host="127.0.0.1", port=4000)
+    serve(app, host='127.0.0.1', port=4000)
