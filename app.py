@@ -3,6 +3,7 @@ from flask import Flask, request
 from namespaces import configure_namespaces
 from flask_restx import Resource
 import sys
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 configure_namespaces()
 
@@ -22,6 +23,8 @@ configureRouteHandlers(api)
 class Shutdown(Resource):
     def get(self):
         return "Hello"
+
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 api.init_app(app)
 
