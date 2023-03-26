@@ -2,7 +2,7 @@ import multiprocessing
 
 from namespaces import get_namespace, NamespaceEnum
 from flask_restx import Resource
-from validator import  val_dataset_local_pipeline, create, has_required_metadata_files
+from validator import  val_dataset_local_pipeline, create, has_required_metadata_files, createGuidedMode
 from flask import request
 
 api = get_namespace(NamespaceEnum.VALIDATE_DATASET)
@@ -24,16 +24,19 @@ class ValidateDatasetLocal(Resource):
         clientUUID = data["clientUUID"]
 
         # 400 of missing one of the arguments
-        if not dataset_structure  or not metadata_files or not clientUUID:
-            api.abort(400, "Missing required arguments")
+        # if not dataset_structure  or not metadata_files or not clientUUID:
+        #     api.abort(400, "Missing required arguments")
 
 
         # 400 if missing required metadata files for validation to be successful 
-        if not has_required_metadata_files(metadata_files):
-            api.abort(400, "Missing required metadata files")
+        # if not has_required_metadata_files(metadata_files):
+        #     api.abort(400, "Missing required metadata files")
 
         try:
-            generation_location = create(dataset_structure, manifests, metadata_files, clientUUID)
+            if "guided-options" in data["dataset_structure"]:
+                generation_location = createGuidedMode(data["dataset_structure"])
+            else:
+                generation_location = create(dataset_structure, manifests, metadata_files, clientUUID)
         except Exception as e:
             raise e
         
