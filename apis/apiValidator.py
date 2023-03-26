@@ -36,9 +36,10 @@ class ValidateDatasetLocal(Resource):
             api.abort(400, "Missing required arguments")
 
         
-        # 400 if missing required metadata files for validation to be successful 
-        if not has_required_metadata_files(metadata_files, guided_mode):
-            api.abort(400, "Missing required metadata files")
+        # 400 if missing required metadata files for validation to be successful
+        if not guided_mode:
+            if not has_required_metadata_files(metadata_files):
+                api.abort(400, "Missing required metadata files")
 
         try:
             if "guided-options" in data["dataset_structure"]:
