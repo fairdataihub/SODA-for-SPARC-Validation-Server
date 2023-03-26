@@ -23,14 +23,22 @@ class ValidateDatasetLocal(Resource):
         metadata_files = data["metadata_files"]
         clientUUID = data["clientUUID"]
 
-        # 400 of missing one of the arguments
-        # if not dataset_structure  or not metadata_files or not clientUUID:
-        #     api.abort(400, "Missing required arguments")
+        guided_mode = False
 
+        if "guided-options" in data["dataset_structure"]:
+            guided_mode = True
 
+        # 400 of missing one of the arguments in Free form mode
+        if guided_mode:
+            if not dataset_structure or not clientUUID:
+                api.abort(400, "Missing required arguments")
+        elif not dataset_structure or not clientUUID or not manifests or not metadata_files:
+            api.abort(400, "Missing required arguments")
+
+        
         # 400 if missing required metadata files for validation to be successful 
-        # if not has_required_metadata_files(metadata_files):
-        #     api.abort(400, "Missing required metadata files")
+        if not has_required_metadata_files(metadata_files, guided_mode):
+            api.abort(400, "Missing required metadata files")
 
         try:
             if "guided-options" in data["dataset_structure"]:
@@ -39,7 +47,7 @@ class ValidateDatasetLocal(Resource):
                 generation_location = create(dataset_structure, manifests, metadata_files, clientUUID)
         except Exception as e:
             raise e
-        
+
 
         try:
             return val_dataset_local_pipeline(generation_location)
