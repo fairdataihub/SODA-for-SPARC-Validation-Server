@@ -719,17 +719,24 @@ def create_metadata_files_guided(dataset_structure, path):
           f.write(guidedChangesMetadata)
 
 
-def createGuidedMode(soda_json_structure):
+def createGuidedMode(soda_json_structure, clientUUID):
+  
   dataset_structure = soda_json_structure["saved-datset-structure-json-obj"]
 
   path = os.path.join(expanduser("~"), "SODA", "skeleton")
 
-  # check if the skeleton directory exists
-  if os.path.exists(path):
-      # remove the non-empty skeleton directory
-      shutil.rmtree(path)
+   # check if the skeleton directory exists   
+  if not os.path.exists(path):
+    # create the skeleton directory
+    os.makedirs(path)
 
-  # create a folder to hold the skeleton
+  # check if the unique path for the client exists
+  path = os.path.join(path, clientUUID)
+  if os.path.exists(path):
+    # remove the directory and all its contents
+    shutil.rmtree(path)
+    
+  # create the directory for the client
   os.mkdir(path)
 
   create_skeleton(dataset_structure, path)
