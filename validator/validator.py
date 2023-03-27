@@ -169,6 +169,7 @@ def create_metadata_files(metadata_struct, path):
 
       if metadata_file_name in ["README.txt", "CHANGES.txt"]:
          # write the data to a txt file 
+         # TODO: Cannot overwrite existing files that are important 
          with open(f"{path}/{metadata_file_name}.txt", "x") as metadata_file:
             metadata_file.write(metadata_obj)
       else:
@@ -196,6 +197,7 @@ def create(dataset_structure, manifests_struct, metadata_files, clientUUID):
     path = os.path.join(path, clientUUID)
     if os.path.exists(path):
         # remove the directory and all its contents
+        # TODO: ensure no critical/root directories can be deleted. Likely run as non-super user should fix this. 
         shutil.rmtree(path)
     
     # create the directory for the client
@@ -748,6 +750,7 @@ def createGuidedMode(soda_json_structure, clientUUID):
   create_metadata_files_guided(soda_json_structure, path)
 
   # copy the manifest files from the guided mode directory to the skeleton directory 
+  # TODO: Fix since manifest files are not stored in this directory anymore in web flow
   guided_manifest_files = os.path.join(expanduser("~"), "SODA", "guided_manifest_files")
   for folder in dataset_structure["folders"].keys():
      guided_manifest_files_high_level_dir = os.path.join(guided_manifest_files, folder)

@@ -21,17 +21,19 @@ class ValidateDatasetLocal(Resource):
 
         guided_mode = False
 
-        if "dataset_structure" not in data:
-            api.abort(400, "Missing required arguments")
-        
+
         if "clientUUID" not in data:
-            api.abort(400, "Missing required arguments")
+            api.abort(400, "Request is missing required clientUUID argument")
+
+        if "dataset_structure" not in data:
+            api.abort(400, f"{clientUUID}: Missing required argument dataset_structure")
+        
 
         if "manifests" not in data:
-            api.abort(400, "Missing required arguments")
+            api.abort(400, f"{clientUUID}: Missing required argument manifests")
 
         if "metadata_files" not in data:
-            api.abort(400, "Missing required arguments")
+            api.abort(400, f"{clientUUID}: Missing required argument metadata_files")
 
 
         if "guided-options" in data["dataset_structure"]:
@@ -47,7 +49,7 @@ class ValidateDatasetLocal(Resource):
         # 400 if missing required metadata files for validation to be successful
         if not guided_mode:
             if not has_required_metadata_files(metadata_files):
-                api.abort(400, "Missing required metadata files")
+                api.abort(400, f"{clientUUID}: Missing required metadata files")
 
         try:
             if "guided-options" in data["dataset_structure"]:
@@ -55,13 +57,13 @@ class ValidateDatasetLocal(Resource):
             else:
                 generation_location = create(dataset_structure, manifests, metadata_files, clientUUID)
         except Exception as e:
-            raise e
+            api.abort(500, f"{clientUUID}: {e}")
 
 
         try:
             return val_dataset_local_pipeline(generation_location)
         except Exception as e:
-            raise e
+            api.abort(500, f"{clientUUID}: {e}")
         
 
 @api.route('/validate/result/<string:clientUUID>')
