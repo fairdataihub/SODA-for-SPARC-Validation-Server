@@ -43,7 +43,7 @@ class ValidateDatasetLocal(Resource):
 
         try:
             if "guided-options" in data["dataset_structure"]:
-                generation_location = createGuidedMode(data["dataset_structure"])
+                generation_location = createGuidedMode(data["dataset_structure"], clientUUID)
             else:
                 generation_location = create(dataset_structure, manifests, metadata_files, clientUUID)
         except Exception as e:
