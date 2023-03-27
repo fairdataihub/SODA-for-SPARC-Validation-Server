@@ -205,13 +205,15 @@ def create(dataset_structure, manifests_struct, metadata_files, clientUUID):
 
     create_skeleton(dataset_structure, path)
 
+    # create metadata files 
+    namespace_logger.info("{clientUUID}: 2. Creating Metadata Files ( Guided: False )")
+    create_metadata_files(metadata_files, path)
+
     # use pandas to parse the manifest files as data frames then write them to the correct folder
+    namespace_logger.info("{clientUUID}: 3. Creating Manifest Files ( Guided: False )")
     create_manifests(manifests_struct, path)
 
     clean_metadata_files(path)
-
-    # create metadata files 
-    create_metadata_files(metadata_files, path)
 
     return path
 
@@ -651,14 +653,16 @@ def save_ds_description_file(
 
 
 
-def create_metadata_files_guided(dataset_structure, path):
+def create_metadata_files_guided(dataset_structure, path, clientUUID):
     # get the table data for subjects and samples 
     subject_table_data = dataset_structure["subjects-table-data"]
     samples_table_data = dataset_structure["samples-table-data"]
 
     if len(subject_table_data) > 0:
+      namespace_logger.info("{clientUUID}: 2.1 Creating subjects.xlsx ( Guided: True )")
       save_subjects_file( path + "/subjects.xlsx", subject_table_data)
     if len(samples_table_data) > 0:
+      namespace_logger.info("{clientUUID}: 2.2 Creating samples.xlsx ( Guided: True )")
       save_samples_file( path + "/samples.xlsx", samples_table_data)
 
     guidedSparcAward = dataset_structure["dataset-metadata"]["shared-metadata"]["sparc-award"];
@@ -677,6 +681,8 @@ def create_metadata_files_guided(dataset_structure, path):
         }
         for milestone in guidedMilestones
     )
+    
+    namespace_logger.info("{clientUUID}: 2.3 Creating submission.xlsx ( Guided: True )")
     save_submission_file(path + "/submission.xlsx", guidedSubmissionMetadataJSON)
 
     # dataset description 
@@ -706,6 +712,7 @@ def create_metadata_files_guided(dataset_structure, path):
     guidedProtocols = dataset_structure["dataset-metadata"]["description-metadata"]["protocols"];
     allDatasetLinks = guidedAdditionalLinks + guidedProtocols
 
+    namespace_logger.info("{clientUUID}: 2.4 Creating dataset_description.xlsx ( Guided: True )")
     save_ds_description_file(path + "/dataset_description.xlsx", guidedDatasetInformation, guidedStudyInformation, guidedContributorInformation, allDatasetLinks)
 
     ## README and CHANGES Metadata variables
@@ -715,9 +722,11 @@ def create_metadata_files_guided(dataset_structure, path):
     # create text file called readme.txt in skeleton directory 
     file_path = os.path.join(path, "README.txt")
 
+    namespace_logger.info("{clientUUID}: 2.5 Creating README.txt ( Guided: True )")
     with open(file_path, "w") as f:
         f.write(guidedReadMeMetadata)
 
+    namespace_logger.info("{clientUUID}: 2.6 Creating CHANGES.txt ( Guided: True )")
     file_path = os.path.join(path, "CHANGES.txt")
     if len(guidedChangesMetadata) > 0:
        with open(file_path, "w") as f:
@@ -747,10 +756,12 @@ def createGuidedMode(soda_json_structure, clientUUID):
   create_skeleton(dataset_structure, path)
 
   # create metadata files
-  create_metadata_files_guided(soda_json_structure, path)
+  namespace_logger.info(f"{clientUUID}: 2. Creating metadata files ( Guided: True ) ")
+  create_metadata_files_guided(soda_json_structure, path, clientUUID)
 
   # copy the manifest files from the guided mode directory to the skeleton directory 
-  # TODO: Fix since manifest files are not stored in this directory anymore in web flow
+  # TODO: Fix since manifest files are not stored in this directory anymore in web flow; update webflow to include it oops
+  namespace_logger.info(f"{clientUUID}: 3. Creating manifest files ( Guided: True ) "
   guided_manifest_files = os.path.join(expanduser("~"), "SODA", "guided_manifest_files")
   for folder in dataset_structure["folders"].keys():
      guided_manifest_files_high_level_dir = os.path.join(guided_manifest_files, folder)

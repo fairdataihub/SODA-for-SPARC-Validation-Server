@@ -45,13 +45,17 @@ class ValidateDatasetLocal(Resource):
         metadata_files = data["metadata_files"]
         clientUUID = data["clientUUID"]
 
+        api.logger.info(f"{clientUUID}: Starting validation ( Guided: {guided_mode} ) ")
 
         # 400 if missing required metadata files for validation to be successful
         if not guided_mode:
+            api.logger.info(f"{clientUUID}: Checking required metadata files ( Guided: {guided_mode} ) ")
             if not has_required_metadata_files(metadata_files):
                 api.abort(400, f"{clientUUID}: Missing required metadata files")
 
+
         try:
+            api.logger.info(f"{clientUUID}: 1. Creating skeleton dataset ( Guided: {guided_mode} ) ")
             if "guided-options" in data["dataset_structure"]:
                 generation_location = createGuidedMode(data["dataset_structure"], clientUUID)
             else:
