@@ -16,6 +16,7 @@ from os.path import expanduser
 from pathlib import Path
 from sparcur.paths import Path as SparCurPath
 from sparcur.simple.validate import main as validate
+from sparcur.simple.clean_metadata_files import main as clean_metadata_files
 import pandas as pd 
 import json 
 from namespaces import NamespaceEnum, get_namespace_logger
@@ -204,6 +205,8 @@ def create(dataset_structure, manifests_struct, metadata_files, clientUUID):
 
     # use pandas to parse the manifest files as data frames then write them to the correct folder
     create_manifests(manifests_struct, path)
+
+    clean_metadata_files(path)
 
     # create metadata files 
     create_metadata_files(metadata_files, path)
