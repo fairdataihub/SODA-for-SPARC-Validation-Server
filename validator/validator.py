@@ -37,7 +37,7 @@ completed_jobs_dir = os.path.join(expanduser("~"), "SODA", "completed_jobs")
 
 namespace_logger = get_namespace_logger(NamespaceEnum.VALIDATE_DATASET)
 
-TEMPLATE_PATH = expanduser("~") + "/SODA-for-SPARC/file_templates"
+TEMPLATE_PATH = expanduser("~") + "/file_templates"
 
 
 def has_required_metadata_files(metadata_files_json):
