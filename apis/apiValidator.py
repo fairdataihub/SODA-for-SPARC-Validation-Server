@@ -18,24 +18,32 @@ class ValidateDatasetLocal(Resource):
         Validate a dataset given the constituent pieces by making a skeleton then validating it
         """
         data = request.get_json()
+
+        guided_mode = False
+
+        if "dataset_structure" not in data:
+            api.abort(400, "Missing required arguments")
+        
+        if "clientUUID" not in data:
+            api.abort(400, "Missing required arguments")
+
+        if "manifests" not in data:
+            api.abort(400, "Missing required arguments")
+
+        if "metadata_files" not in data:
+            api.abort(400, "Missing required arguments")
+
+
+        if "guided-options" in data["dataset_structure"]:
+            guided_mode = True
+
+
         dataset_structure = data["dataset_structure"]["dataset-structure"]
         manifests = data["manifests"]
         metadata_files = data["metadata_files"]
         clientUUID = data["clientUUID"]
 
-        guided_mode = False
 
-        if "guided-options" in data["dataset_structure"]:
-            guided_mode = True
-
-        # 400 of missing one of the arguments in Free form mode
-        if guided_mode:
-            if not dataset_structure or not clientUUID:
-                api.abort(400, "Missing required arguments")
-        elif not dataset_structure or not clientUUID or not manifests or not metadata_files:
-            api.abort(400, "Missing required arguments")
-
-        
         # 400 if missing required metadata files for validation to be successful
         if not guided_mode:
             if not has_required_metadata_files(metadata_files):
