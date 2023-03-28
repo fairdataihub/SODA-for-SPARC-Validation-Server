@@ -788,7 +788,7 @@ def val_dataset_local_pipeline(ds_path, clientUUID):
     except Exception as e:
        abort(500, e)
 
-    delete_validation_directory(joined_path)
+    delete_validation_directory(ds_path)
 
     if 'status' not in blob or 'path_error_report' not in blob['status']:
         namespace_logger.info(f"{clientUUID}: 4.1 Validation Run Incomplete ( Guided: True )")
