@@ -214,7 +214,7 @@ def create(dataset_structure, manifests_struct, metadata_files, clientUUID):
     create_manifests(manifests_struct, path)
 
     # clean the metadata files to prevent vaidator hanging on large datasets
-    clean_metadata_files(cleaned_output_path=Path(path))
+    # clean_metadata_files(cleaned_output_path=Path(path))
 
     return path
 
