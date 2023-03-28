@@ -2,7 +2,7 @@ import multiprocessing
 
 from namespaces import get_namespace, NamespaceEnum
 from flask_restx import Resource
-from validator import  val_dataset_local_pipeline, create, has_required_metadata_files, createGuidedMode
+from validator import  val_dataset_local_pipeline, create, has_required_metadata_files, createGuidedMode, delete_validation_directory
 from flask import request
 
 api = get_namespace(NamespaceEnum.VALIDATE_DATASET)
@@ -61,6 +61,8 @@ class ValidateDatasetLocal(Resource):
             else:
                 generation_location = create(dataset_structure, manifests, metadata_files, clientUUID)
         except Exception as e:
+            # remove any directory that was created, if created
+            delete_validation_directory(clientUUID)
             api.abort(500, f"{clientUUID}: {e}")
 
 
@@ -68,6 +70,8 @@ class ValidateDatasetLocal(Resource):
             api.logger.info(f"{clientUUID}: 4. Validating the dataset ( Guided: {guided_mode} ) ")
             return val_dataset_local_pipeline(generation_location, clientUUID)
         except Exception as e:
+            # remove the directory that was created, if created
+            delete_validation_directory(clientUUID)
             api.abort(500, f"{clientUUID}: {e}")
         
 

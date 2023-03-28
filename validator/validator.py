@@ -810,8 +810,15 @@ def val_dataset_local_pipeline(ds_path, clientUUID):
     return {"parsed_report": parsed_report, "full_report": str(blob), "status": "Complete"}
 
 
-
-
+"""
+Delete the validation directory for the given clientUUID.
+"""
+def delete_validation_directory(clientUUID):
+    # check if there is a skeleton dataset directory with this clientUUID as the name
+    path = os.path.join(expanduser("~"), "SODA", "skeleton", clientUUID)
+    if os.path.exists(path):
+        # remove the directory and all its contents
+        shutil.rmtree(path)
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=9000)
