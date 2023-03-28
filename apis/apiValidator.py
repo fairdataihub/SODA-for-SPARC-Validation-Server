@@ -57,7 +57,7 @@ class ValidateDatasetLocal(Resource):
         try:
             api.logger.info(f"{clientUUID}: 1. Creating skeleton dataset ( Guided: {guided_mode} ) ")
             if "guided-options" in data["dataset_structure"]:
-                generation_location = createGuidedMode(data["dataset_structure"], clientUUID)
+                generation_location = createGuidedMode(data["dataset_structure"], clientUUID, manifests)
             else:
                 generation_location = create(dataset_structure, manifests, metadata_files, clientUUID)
         except Exception as e:
@@ -65,7 +65,8 @@ class ValidateDatasetLocal(Resource):
 
 
         try:
-            return val_dataset_local_pipeline(generation_location)
+            api.logger.info(f"{clientUUID}: 4. Validating the dataset ( Guided: {guided_mode} ) ")
+            return val_dataset_local_pipeline(generation_location, clientUUID)
         except Exception as e:
             api.abort(500, f"{clientUUID}: {e}")
         

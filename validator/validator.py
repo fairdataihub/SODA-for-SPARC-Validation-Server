@@ -213,7 +213,8 @@ def create(dataset_structure, manifests_struct, metadata_files, clientUUID):
     namespace_logger.info("{clientUUID}: 3. Creating Manifest Files ( Guided: False )")
     create_manifests(manifests_struct, path)
 
-    clean_metadata_files(path)
+    # clean the metadata files to prevent vaidator hanging on large datasets
+    clean_metadata_files(cleaned_output_path=Path(path))
 
     return path
 
@@ -733,7 +734,7 @@ def create_metadata_files_guided(dataset_structure, path, clientUUID):
           f.write(guidedChangesMetadata)
 
 
-def createGuidedMode(soda_json_structure, clientUUID):
+def createGuidedMode(soda_json_structure, clientUUID, manifests_struct):
   
   dataset_structure = soda_json_structure["saved-datset-structure-json-obj"]
 
@@ -759,24 +760,14 @@ def createGuidedMode(soda_json_structure, clientUUID):
   namespace_logger.info(f"{clientUUID}: 2. Creating metadata files ( Guided: True ) ")
   create_metadata_files_guided(soda_json_structure, path, clientUUID)
 
-  # copy the manifest files from the guided mode directory to the skeleton directory 
-  # TODO: Fix since manifest files are not stored in this directory anymore in web flow; update webflow to include it oops
-  namespace_logger.info(f"{clientUUID}: 3. Creating manifest files ( Guided: True ) "
-  guided_manifest_files = os.path.join(expanduser("~"), "SODA", "guided_manifest_files")
-  for folder in dataset_structure["folders"].keys():
-     guided_manifest_files_high_level_dir = os.path.join(guided_manifest_files, folder)
-     if os.path.exists(guided_manifest_files_high_level_dir):
-        manifest_path = os.path.join(guided_manifest_files_high_level_dir, "manifest.xlsx")
-        manifest_path_destination = os.path.join(path, folder)
-        shutil.copy(manifest_path, manifest_path_destination)
-
+  create_manifests(manifests_struct, path)
 
   return path
 
 
 
 # validate a local dataset at the target directory 
-def val_dataset_local_pipeline(ds_path):
+def val_dataset_local_pipeline(ds_path, clientUUID):
     # convert the path to absolute from user's home directory
     joined_path = os.path.join(expanduser("~"), ds_path.strip())
 
@@ -798,7 +789,10 @@ def val_dataset_local_pipeline(ds_path):
        abort(500, e)
 
     if 'status' not in blob or 'path_error_report' not in blob['status']:
+        namespace_logger.info(f"{clientUUID}: 4.1 Validation Run Incomplete ( Guided: True )")
         return {"parsed_report": {}, "full_report": str(blob), "status": "Incomplete"}
+    
+    namespace_logger.info(f"{clientUUID}: 4.2 Parsing dataset results( Guided: True ) ")
     
     # peel out the status object 
     status = blob.get('status')
