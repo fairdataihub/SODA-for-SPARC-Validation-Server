@@ -807,7 +807,7 @@ def val_dataset_local_pipeline(ds_path, clientUUID):
 
     # remove any false positives from the report
     # TODO: Implement the below function
-    # parsed_report = remove_false_positives(parsed_report, blob)
+    remove_false_positives(parsed_report, blob)
 
     return {"parsed_report": parsed_report, "full_report": str(blob), "status": "Complete"}
 
@@ -821,6 +821,18 @@ def delete_validation_directory(clientUUID):
     if os.path.exists(path):
         # remove the directory and all its contents
         shutil.rmtree(path)
+
+
+def remove_false_positives(parsed_report, blob):
+
+    # remove the 'path_metadata' is a required proeprty error message
+
+
+    # remove the #/id error from the parsed report if not dealing with Pennsieve
+    # TODO: In time we should be able to pull from Pennsieve then validate correctly. Otherwise just pull their ID ourselves and run a regex. 
+    if '#/id' in parsed_report:
+        del parsed_report['#/id']
+
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=9000)
