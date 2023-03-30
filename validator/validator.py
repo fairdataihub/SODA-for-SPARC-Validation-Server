@@ -170,12 +170,12 @@ def create_metadata_files(metadata_struct, path):
       if metadata_file_name in ["README.txt", "CHANGES.txt"]:
          # write the data to a txt file 
          # TODO: Cannot overwrite existing files that are important 
-         with open(f"{path}/{metadata_file_name}.txt", "x") as metadata_file:
+         with open(f"{path}/{metadata_file_name}", "x") as metadata_file:
             metadata_file.write(metadata_obj)
       else:
         metadata_df = pd.DataFrame(json.loads(metadata_obj))
 
-        metadata_df.to_excel(f"{path}/{metadata_file_name}.xlsx", index=False, engine="openpyxl")
+        metadata_df.to_excel(f"{path}/{metadata_file_name}", index=False, engine="openpyxl")
 
 def create(dataset_structure, manifests_struct, metadata_files, clientUUID):
     """
