@@ -826,6 +826,13 @@ def delete_validation_directory(clientUUID):
 def remove_false_positives(parsed_report, blob):
 
     # remove the 'path_metadata' is a required proeprty error message
+    if '#/' in parsed_report:
+        messages = parsed_report['#/']['messages']
+        # remove the message from the messages list with 'path_metadata' as a substring
+        for message in messages:
+            if 'path_metadata' in message:
+                messages.remove(message)
+        
 
 
     # remove the #/id error from the parsed report if not dealing with Pennsieve
