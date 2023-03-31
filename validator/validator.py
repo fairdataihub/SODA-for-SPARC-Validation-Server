@@ -25,6 +25,7 @@ from openpyxl.styles import PatternFill, Font
 import numpy as np
 from string import ascii_uppercase
 import itertools
+import time
 
 
 
@@ -214,7 +215,7 @@ def create(dataset_structure, manifests_struct, metadata_files, clientUUID):
     create_manifests(manifests_struct, path)
 
     # clean the metadata files to prevent vaidator hanging on large datasets
-    # clean_metadata_files(cleaned_output_path=Path(path))
+    clean_metadata_files(path=SparCurPath(path), cleaned_output_path=SparCurPath(path))
 
     return path
 
@@ -761,6 +762,13 @@ def createGuidedMode(soda_json_structure, clientUUID, manifests_struct):
   create_metadata_files_guided(soda_json_structure, path, clientUUID)
 
   create_manifests(manifests_struct, path)
+
+  # clean the manifest and metadata files to prevent hanging caused by openpyxl trying to open manifest/metadata files with 
+  # excessive amounts of empty rows/columns
+  clean_metadata_files(path=SparCurPath(path), cleaned_output_path=SparCurPath(path))
+
+
+
 
   return path
 
