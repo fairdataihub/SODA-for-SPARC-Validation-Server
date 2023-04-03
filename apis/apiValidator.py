@@ -1,9 +1,11 @@
-import multiprocessing
-
 from namespaces import get_namespace, NamespaceEnum
 from flask_restx import Resource
-from validator import  val_dataset_local_pipeline, create, has_required_metadata_files, createGuidedMode, delete_validation_directory
+from validator import  create, has_required_metadata_files, createGuidedMode, delete_validation_directory
 from flask import request
+import subprocess
+import os.path
+from os.path import expanduser
+import json 
 
 api = get_namespace(NamespaceEnum.VALIDATE_DATASET)
 
@@ -68,17 +70,34 @@ class ValidateDatasetLocal(Resource):
 
         try:
             api.logger.info(f"{clientUUID}: 4. Validating the dataset ( Guided: {guided_mode} ) ")
-            return val_dataset_local_pipeline(generation_location, clientUUID)
+            # return val_dataset_local_pipeline(generation_location, clientUUID)
+            subprocess.Popen(["python", "validate.py", generation_location, clientUUID])
+            print("We are done early")
         except Exception as e:
             # remove the directory that was created, if created
             delete_validation_directory(clientUUID)
             api.abort(500, f"{clientUUID}: {e}")
         
 
-@api.route('/validate/result/<string:clientUUID>')
+@api.route('/results/<string:clientUUID>')
 class ValidateDatasetLocalResult(Resource):
     def get(self, clientUUID):
         """
         Get the result of a validation report
         """
-        pass
+        results_path = os.path.join(expanduser("~"), "SODA", "results")
+        user_file_path = os.path.join(results_path, f"{clientUUID}.json")
+
+        # check if a file exists in the results directory with the given clientUUID
+        if not os.path.exists(user_file_path):
+            return {"status": "WIP", "parsed_report": {}, "full_report": {}}
+        
+        # read the file and return the contents
+        results = {}
+        with open(user_file_path, "r") as f:
+            results = json.load(f)
+
+        # remove the results file 
+        os.remove(user_file_path)
+
+        return results
