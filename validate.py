@@ -91,6 +91,7 @@ def remove_false_positives(parsed_report, blob):
 # validate a local dataset at the target directory 
 def val_dataset_local_pipeline(ds_path, clientUUID):
     results_path = os.path.join(expanduser("~"), "SODA", "results")
+    temp_log_path = os.path.join(expanduser("~"), "validation_progress.txt")
 
     if not os.path.exists(results_path):
       os.mkdir(results_path)
@@ -102,8 +103,12 @@ def val_dataset_local_pipeline(ds_path, clientUUID):
 
     # clean the manifest and metadata files to prevent hanging caused by openpyxl trying to open manifest/metadata files with 
     # excessive amounts of empty rows/columns
-    # skeleton_path = os.path.join(expanduser("~"), "SODA", "skeleton", clientUUID)
-    # clean_metadata_files(path=SparCurPath(skeleton_path), cleaned_output_path=SparCurPath(skeleton_path))
+    skeleton_path = os.path.join(expanduser("~"), "SODA", "skeleton", clientUUID)
+    clean_metadata_files(path=SparCurPath(skeleton_path), cleaned_output_path=SparCurPath(skeleton_path))
+
+    # write to a file that we got this far
+    with open(temp_log_path, "w") as f:
+       f.write("Cleaned the metadata files")
       
     # convert the path to absolute from user's home directory
     joined_path = os.path.join(expanduser("~"), ds_path.strip())
@@ -130,9 +135,14 @@ def val_dataset_local_pipeline(ds_path, clientUUID):
        with open(user_results_file, "w") as f:
             json.dump(results, f)
        # we are done now
-       return 
+       return
 
-    delete_validation_directory(ds_path)
+
+        # write to a file that we got this far
+    with open(temp_log_path, "w") as f:
+       f.write("Created the blob") 
+
+    # delete_validation_directory(ds_path)
 
     if 'status' not in blob or 'path_error_report' not in blob['status']:
         # namespace_logger.info(f"{clientUUID}: 4.1 Validation Run Incomplete ( Guided: True )")
@@ -156,6 +166,10 @@ def val_dataset_local_pipeline(ds_path, clientUUID):
     # remove any false positives from the report
     # TODO: Implement the below function
     remove_false_positives(parsed_report, blob)
+
+    # write to a file that we got this far
+    with open(temp_log_path, "w") as f:
+       f.write("Parsed and Removed False Positives")
 
     results = {"status": "Complete", "parsed_report": parsed_report, "full_report": str(blob)}
     with open(user_results_file, "w") as f:
