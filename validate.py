@@ -100,11 +100,13 @@ def val_dataset_local_pipeline(ds_path, clientUUID):
     if os.path.exists(user_results_file):
       os.remove(user_results_file)
 
-
+    print("About to clean metadata files")
     # clean the manifest and metadata files to prevent hanging caused by openpyxl trying to open manifest/metadata files with 
     # excessive amounts of empty rows/columns
     skeleton_path = os.path.join(expanduser("~"), "SODA", "skeleton", clientUUID)
     clean_metadata_files(path=SparCurPath(skeleton_path), cleaned_output_path=SparCurPath(skeleton_path))
+    print("Cleaned metadata files")
+
 
     # write to a file that we got this far
     with open(temp_log_path, "w") as f:
@@ -123,6 +125,9 @@ def val_dataset_local_pipeline(ds_path, clientUUID):
     # convert to Path object for Validator to function properly
     norm_ds_path = Path(joined_path)
 
+    print("Starting validation")
+
+
     # validate the dataset
     blob = None 
     try: 
@@ -137,8 +142,9 @@ def val_dataset_local_pipeline(ds_path, clientUUID):
        # we are done now
        return
 
+    print("Finished validation")
 
-        # write to a file that we got this far
+    # write to a file that we got this far
     with open(temp_log_path, "w") as f:
        f.write("Created the blob") 
 
