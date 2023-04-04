@@ -98,6 +98,6 @@ class ValidateDatasetLocalResult(Resource):
             results = json.load(f)
 
         # remove the results file 
-        # os.remove(user_file_path)
+        os.remove(user_file_path)
 
         return results
