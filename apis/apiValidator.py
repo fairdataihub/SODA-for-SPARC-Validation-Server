@@ -71,7 +71,7 @@ class ValidateDatasetLocal(Resource):
         try:
             api.logger.info(f"{clientUUID}: 4. Validating the dataset ( Guided: {guided_mode} ) ")
             # return val_dataset_local_pipeline(generation_location, clientUUID)
-            subprocess.Popen(["python", "validate.py", generation_location, clientUUID])
+            subprocess.Popen(["python3", "validate.py", generation_location, clientUUID])
             print("We are done early")
         except Exception as e:
             # remove the directory that was created, if created
