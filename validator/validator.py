@@ -321,7 +321,7 @@ def save_subjects_file(filepath, datastructure):
 
 
 def save_samples_file(filepath, datastructure):
-    source = os.pah.join(TEMPLATE_PATH, "samples.xlsx")
+    source = os.path.join(TEMPLATE_PATH, "samples.xlsx")
 
     destination = filepath
 
