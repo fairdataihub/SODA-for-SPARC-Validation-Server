@@ -8,8 +8,17 @@ import shutil
 import json 
 import copy
 import sys
+from loguru import logger   
 
 
+# do not duplicate logs 
+logger.remove(0)
+
+# log file path 
+log_location = os.path.join(expanduser("~"), "validation.log")
+
+# write the logs to a file; rotate the file out every 10 MB; show which functions are called with backtrace; do not show all parameters passed into the functions
+logger.add(log_location, rotation="10 MB", backtrace=True, diagnose=False)
 
 
 """
@@ -90,8 +99,8 @@ def remove_false_positives(parsed_report, blob):
 
 # validate a local dataset at the target directory 
 def val_dataset_local_pipeline(ds_path, clientUUID):
+    global logger
     results_path = os.path.join(expanduser("~"), "SODA", "results")
-    temp_log_path = os.path.join(expanduser("~"), "validation_progress.txt")
 
     if not os.path.exists(results_path):
       os.mkdir(results_path)
@@ -100,17 +109,13 @@ def val_dataset_local_pipeline(ds_path, clientUUID):
     if os.path.exists(user_results_file):
       os.remove(user_results_file)
 
-    print("About to clean metadata files")
     # clean the manifest and metadata files to prevent hanging caused by openpyxl trying to open manifest/metadata files with 
     # excessive amounts of empty rows/columns
     skeleton_path = os.path.join(expanduser("~"), "SODA", "skeleton", clientUUID)
     clean_metadata_files(path=SparCurPath(skeleton_path), cleaned_output_path=SparCurPath(skeleton_path))
-    print("Cleaned metadata files")
 
 
-    # write to a file that we got this far
-    with open(temp_log_path, "w") as f:
-       f.write("Cleaned the metadata files")
+    logger.info("Cleaned the metadata files")
       
     # convert the path to absolute from user's home directory
     joined_path = os.path.join(expanduser("~"), ds_path.strip())
@@ -120,12 +125,13 @@ def val_dataset_local_pipeline(ds_path, clientUUID):
 
     # give user an error 
     if not valid_directory:
+        logger.exception(f"The given directory does not exist: {joined_path}")
         raise OSError(f"The given directory does not exist: {joined_path}")
 
     # convert to Path object for Validator to function properly
     norm_ds_path = Path(joined_path)
 
-    print("Starting validation")
+    logger.info("Starting validation")
 
 
     # validate the dataset
@@ -139,14 +145,10 @@ def val_dataset_local_pipeline(ds_path, clientUUID):
        # write results to a json file
        with open(user_results_file, "w") as f:
             json.dump(results, f)
-       # we are done now
+       logger.exception(f"Error validating dataset: {e}")
        return
 
-    print("Finished validation")
-
-    # write to a file that we got this far
-    with open(temp_log_path, "w") as f:
-       f.write("Created the blob") 
+    logger.info("Finished validation")
 
     delete_validation_directory(ds_path)
 
@@ -156,9 +158,8 @@ def val_dataset_local_pipeline(ds_path, clientUUID):
         # write results to a json file
         with open(user_results_file, "w") as f:
               json.dump(results, f)
+        logger.info("Incomplete validation run ")
         return 
-    
-    # namespace_logger.info(f"{clientUUID}: 4.2 Parsing dataset results( Guided: True ) ")
     
     # peel out the status object 
     status = blob.get('status')
@@ -170,12 +171,9 @@ def val_dataset_local_pipeline(ds_path, clientUUID):
     parsed_report = parse(path_error_report)  
 
     # remove any false positives from the report
-    # TODO: Implement the below function
     remove_false_positives(parsed_report, blob)
 
-    # write to a file that we got this far
-    with open(temp_log_path, "w") as f:
-       f.write("Parsed and Removed False Positives")
+    logger.info("Parsed and Removed False Positives")
 
     results = {"status": "Complete", "parsed_report": parsed_report, "full_report": str(blob)}
     with open(user_results_file, "w") as f:
